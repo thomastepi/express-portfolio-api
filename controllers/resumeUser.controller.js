@@ -117,7 +117,7 @@ async function build(req, res) {
       res.status(error.response.status).json(error.response.data);
     } else {
       console.error("Something went wrong", error.messsage);
-      res.status(500).json({ error: { message: "Something went wrong" } });
+      res.status(500).send("Something went wrong. Please try again later.");
     }
   }
 }
