@@ -1,6 +1,5 @@
 const allowedOrigins = [
-    'https://resume-craft.onrender.com',
-    "http://localhost:3000",
+    'https://resume-craft.onrender.com/',
 ]
     
     
