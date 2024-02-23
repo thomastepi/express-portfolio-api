@@ -1,10 +1,13 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const corsOptions = require('./config/corsOptions');
 const app = express();
 
-app.use(cors(corsOptions));
+app.use(cors({
+  origin: 'https://resume-craft.onrender.com',
+  credentials: true
+
+}));
 const port = process.env.PORT || 5000;
 
 
