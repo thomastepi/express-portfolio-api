@@ -16,6 +16,7 @@ const userSchema = new mongoose.Schema(
     experience: { type: Array, default: [] },
     projects: { type: Array, default: [] },
   },
+  { collection: "resume-users"},
   { timestamps: true }
 );
 
