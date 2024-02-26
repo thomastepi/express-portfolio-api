@@ -8,6 +8,7 @@ const allowedOrigins = [
   "https://resume-craft.onrender.com",
   "http://localhost:3000",
   "https://www.thomastepi.com",
+  "https://www.thomastepi.info",
 ];
 
 app.use(
