@@ -30,7 +30,7 @@ const addMessage = async (req, res) => {
       name: "Portfolio Contact Form",
       address: process.env.EMAIL,
     },
-    to: process.env.DESTINATION_EMAIL,
+    to: process.env.ADMIN_EMAIL,
     subject: "New Form Submission,",
     text: `Name: ${name}\nEmail: ${email}\nType: ${type}\nComment: ${comment}`,
   };
