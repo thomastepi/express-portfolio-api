@@ -12,7 +12,7 @@ const authenticateToken = (req, res, next) => {
         }
         if (decoded.role && decoded.role === 'guest') {
             if (req.method === "POST" || req.method === "PATCH" || req.method === "DELETE") {
-                return res.status(403).send("Read-Only access for Guest Users. You cannot Create, Edit, or Delete content.");
+                return res.status(403).send(`You're currently logged in as a Guest User, which means you can view content but cannot create, edit, or delete it. To access these features, please log in or sign up for an account.`);
             }
         }
         req.body.user = decoded;

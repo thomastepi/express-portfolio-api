@@ -35,8 +35,8 @@ const sendEmail = async (req, res) => {
       text: `New subscriber details:\nEmail: ${email}\nFirst Name: ${firstName}\nLast Name: ${lastName}\nCompany: ${company}`,
     };
 
-    await transporter.sendMail(userMailOptions);
-    await transporter.sendMail(adminMailOptions);
+    transporter.sendMail(userMailOptions);
+    transporter.sendMail(adminMailOptions);
 
     res.status(200).json({
       message: `Thank you for subscribing to our newsletter ${

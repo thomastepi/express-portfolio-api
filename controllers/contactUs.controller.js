@@ -13,7 +13,7 @@ const transporter = nodeMailer.createTransport({
 
 const sendEmail = async (req, res) => {
   try {
-    const { email, name, comment } = req.body;
+    const { email, name, message } = req.body;
 
     const userMailOptions = {
       from: {
@@ -32,13 +32,17 @@ const sendEmail = async (req, res) => {
       },
       to: process.env.ADMIN_EMAIL,
       subject: "New Contact Us Submission",
-      text: `New submission details:\nEmail: ${email}\nName: ${name}\nComment: ${comment}`,
+      text: `New submission details:\nEmail: ${email}\nName: ${name}\nComment: ${message}`,
     };
 
-    await transporter.sendMail(userMailOptions);
-    await transporter.sendMail(adminMailOptions);
+    transporter.sendMail(userMailOptions);
+    transporter.sendMail(adminMailOptions);
 
-    res.status(200).json({ message: `Thank you for contacting us ${name}! We will get back to you soon.` });
+    res
+      .status(200)
+      .json({
+        message: `Thank you for contacting us ${name}! We will get back to you soon.`,
+      });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
