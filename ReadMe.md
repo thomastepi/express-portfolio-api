@@ -3,7 +3,7 @@
 This repository houses the Node.js and Express.js backend API for several projects:
 
 ## Portfolio Website:
-This API handles contact form submissions from your portfolio website. The form might collect information like name, email, and message content.
+This API handles contact form submissions from the portfolio website. The form collects the following information: name, email, type of inquiry, and message content.
 
 ## Sawyer Camp Farmers Common Initiative Group Website: 
 This API manages functionalities for the Sawyer Camp Farmers website, including:
