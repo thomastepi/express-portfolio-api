@@ -10,6 +10,7 @@ const allowedOrigins = [
   "https://www.thomastepi.info",
   "https://sawyer-camp-farmers.onrender.com",
   "https://bookmart-trw5.onrender.com",
+  "https://annette-beauty-spa.onrender.com/",
 ];
 
 app.use(
@@ -28,12 +29,14 @@ const resumeUserRoute = require("./routes/resumeUser.route");
 const portfolioRoute = require("./routes/portfolio.route");
 const newsletterRouter = require("./routes/newsletter.route");
 const contactUsRouter = require("./routes/contactUs.route");
+const checkoutRoute = require("./routes/checkout.route");
 
 app.use(express.json());
 app.use("/api/user", resumeUserRoute);
 app.use("/api/portfolio", portfolioRoute);
 app.use("/newsletter", newsletterRouter);
 app.use("/contact-us", contactUsRouter);
+app.use("/api", checkoutRoute);
 
 app.use("/api/users", bookUserRoute);
 app.use("/api/books", bookRoute);

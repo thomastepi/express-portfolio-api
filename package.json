@@ -18,7 +18,8 @@
     "mongoose": "^8.0.1",
     "node-fetch": "^3.3.2",
     "nodemailer": "^6.9.10",
-    "openai": "^4.23.0"
+    "openai": "^4.23.0",
+    "stripe": "^15.5.0"
   },
   "devDependencies": {
     "nodemon": "^3.0.2"
