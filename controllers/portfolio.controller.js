@@ -41,27 +41,39 @@ const addMessage = async (req, res) => {
       address: process.env.EMAIL,
     },
     to: email,
-    subject: "Thanks for contacting us!",
+    subject: "Thanks for contacting me!",
     html: `
     <p>Hi ${name},</p>
 
-    <p>Thanks for reaching out to me through my portfolio website! I received your message and will get back to you as soon as possible.</p>
+        <p>Thanks for reaching out to me through my portfolio website! I received your message and will get back to you as soon as possible.</p>
 
-    <p>In the meantime, here's a quick recap of your message:</p>
+        <p>In the meantime, here's a quick recap of your message:</p>
 
-    <ul>
-      <li>Your Name: ${name}</li>
-      <li>Your Email: ${email}</li>
-      <li>Your Message: ${comment}</li>
-    </ul>
+        <ul>
+          <li>Your Name: ${name}</li>
+          <li>Your Email: ${email}</li>
+          <li>Your Message: ${comment}</li>
+        </ul>
 
-    <p>If you have any further questions or need to clarify anything, please don't hesitate to reply to this email.</p>
+        <p>You can also connect with me on:</p>
+        <ul style="list-style: none; padding: 0;">
+          <li style="margin-bottom: 8px;">
+            <a href="https://twitter.com/TomTepi" target="_blank" style="text-decoration: none; color: inherit;">
+              <img src="https://cdn-icons-png.flaticon.com/512/733/733579.png" alt="Twitter" style="width: 20px; height: 20px; vertical-align: middle;"/> Twitter
+            </a>
+          </li>
+          <li>
+            <a href="https://linkedin.com/in/thomastepi" target="_blank" style="text-decoration: none; color: inherit;">
+              <img src="https://cdn-icons-png.flaticon.com/512/174/174857.png" alt="LinkedIn" style="width: 20px; height: 20px; vertical-align: middle;"/> LinkedIn
+            </a>
+          </li>
+        </ul>
 
-    <p>Thanks again for your interest!</p>
+        <p>Thanks again for your interest!</p>
 
-    <p>Sincerely,</p>
+        <p>Sincerely,</p>
 
-    <p>Thomas Tepi.</p>`,
+        <p>Thomas Tepi.</p>`,
   };
 
   transporter.sendMail(AdminMailOptions, (err) => {

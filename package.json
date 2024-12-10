@@ -17,7 +17,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.0.1",
     "node-fetch": "^3.3.2",
-    "nodemailer": "^6.9.10",
+    "nodemailer": "^6.9.16",
     "openai": "^4.23.0",
     "stripe": "^15.5.0"
   },

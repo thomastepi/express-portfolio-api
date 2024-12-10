@@ -9,10 +9,10 @@ async function login(req, res) {
   const { username, password } = req.body;
   const user = await UserModel.findOne({ username }).catch((err) => {
     console.error("Error: ", err);
-    res.status(500).send("Internal server error");
+    res.status(500).json({ error: "Internal server error" });
   });
   if (!user) {
-    res.status(404).send("User not found");
+    res.status(404).json({ error: "User not found" });
   } else {
     const match = await bcrypt.compare(password, user.password);
     if (match) {
@@ -21,7 +21,7 @@ async function login(req, res) {
         { username: user.username, role: role },
         process.env.ACCESS_TOKEN
       );
-      res.status(200).send({
+      res.status(200).json({
         username: user.username,
         firstName: user.firstName,
         lastName: user.lastName,
@@ -37,7 +37,7 @@ async function login(req, res) {
         accessToken,
       });
     } else {
-      res.status(401).send("Invalid password");
+      res.status(401).json({ error: "Invalid password" });
     }
   }
 }
@@ -111,12 +111,15 @@ async function build(req, res) {
     const response = await runCompletion(text);
     res.json({ data: response.choices });
   } catch (error) {
-    if (error.response) {
-      console.error(error.response.data, error.response.status);
-      res.status(error.response.status).json(error.response.data);
+    if (error.status === 429) {
+      res
+        .status(429)
+        .json(
+          "The AI-powered resume builder is currently unavailable due to quota limitations. We are working on resolving this, and it will be up and running soon. Thank you for your understanding!"
+        );
     } else {
-      console.error("Something went wrong", error.messsage);
-      res.status(500).send("Something went wrong. Please try again later.");
+      console.error(error.message);
+      res.status(500).json("Internal server error");
     }
   }
 }
