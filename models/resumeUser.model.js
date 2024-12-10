@@ -16,8 +16,7 @@ const userSchema = new mongoose.Schema(
     experience: { type: Array, default: [] },
     projects: { type: Array, default: [] },
   },
-  { collection: "resume-users"},
-  { timestamps: true }
+  { collection: "resume-users", timestamps: true, strict: false }
 );
 
 const UserModel = mongoose.model("User", userSchema);
