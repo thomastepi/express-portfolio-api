@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const UserModel = require("../models/resumeUser.model");
+const GuestSessionModel = require("../models/resumeGuestUser.model");
 const runCompletion = require("../config/openai");
 
 const saltRounds = 10;
@@ -124,9 +125,27 @@ async function build(req, res) {
   }
 }
 
+async function guestSession(req, res) {
+  try {
+    const sessionId = `guest-${Date.now()}-${Math.random()
+      .toString(36)
+      .substr(2, 9)}`;
+
+    const newSession = new GuestSessionModel({ sessionId });
+    await newSession.save();
+
+    //console.log("Guest session logged:", sessionId);
+    res.status(200).send({ message: "Guest session logged successfully." });
+  } catch (error) {
+    console.error("Error logging guest session:", error);
+    res.status(500).send({ error: "Failed to log guest session." });
+  }
+}
+
 module.exports = {
   login,
   register,
   update,
   build,
+  guestSession,
 };

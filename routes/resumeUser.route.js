@@ -8,11 +8,13 @@ const {
   register,
   update,
   build,
+  guestSession,
 } = require("../controllers/resumeUser.controller");
 
 router.post("/login", login);
 router.post("/register", register);
 router.patch("/update", authenticateToken, update);
 router.post("/build", authenticateToken, build);
+router.post("/guest-log", guestSession);
 
 module.exports = router;
