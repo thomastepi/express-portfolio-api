@@ -29,12 +29,14 @@ async function login(req, res) {
         mobileNumber: user.mobileNumber,
         email: user.email,
         portfolio: user.portfolio,
-        careerObjective: user.careerObjective,
+        summary: user.summary,
         address: user.address,
         education: user.education,
         skills: user.skills,
         projects: user.projects,
         experience: user.experience,
+        certifications: user.certifications,
+        languages: user.languages,
         accessToken,
       });
     } else {
@@ -93,12 +95,14 @@ async function update(req, res) {
       mobileNumber: user.mobileNumber,
       email: user.email,
       portfolio: user.portfolio,
-      careerObjective: user.careerObjective,
+      summary: user.summary,
       address: user.address,
       education: user.education,
       skills: user.skills,
       projects: user.projects,
       experience: user.experience,
+      certifications: user.certifications,
+      languages: user.languages,
     });
   } catch (err) {
     console.log(err);

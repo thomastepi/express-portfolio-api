@@ -9,12 +9,14 @@ const userSchema = new mongoose.Schema(
     email: { type: String, default: "" },
     mobileNumber: { type: String, default: "" },
     portfolio: { type: String, default: "" },
-    careerObjective: { type: String, default: "" },
+    summary: { type: String, default: "" },
     address: { type: String, default: "" },
     education: { type: Array, default: [] },
     skills: { type: Array, default: [] },
     experience: { type: Array, default: [] },
     projects: { type: Array, default: [] },
+    certifications: { type: Array, default: [] },
+    languages: { type: Array, default: [] },
   },
   { collection: "resume-users", timestamps: true, strict: false }
 );
