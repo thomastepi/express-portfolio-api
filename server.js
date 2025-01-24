@@ -11,6 +11,11 @@ const allowedOrigins = [
   "https://sawyer-camp-farmers.onrender.com",
   "https://bookmart-trw5.onrender.com",
   "https://annette-beauty-spa.onrender.com",
+
+  "https://resumecraft.thomastepi.com",
+  "https://sawyercamp.thomastepi.com",
+  "https://bookmart.thomastepi.com",
+  "https://annette.thomastepi.com",
 ];
 
 app.use(
