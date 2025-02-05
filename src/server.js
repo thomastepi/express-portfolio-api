@@ -20,10 +20,19 @@ const allowedOrigins = [
 
 app.use(
   cors({
-    origin: allowedOrigins,
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     credentials: true,
   })
 );
+
+app.use(express.json());
 
 require("./config/database");
 const resumeUserRoute = require("./routes/resumeUser.route");
@@ -35,7 +44,6 @@ const paypalRoutes = require("./routes/paypal.route");
 const bookUserRoute = require("./routes/bookUser.route");
 const bookRoute = require("./routes/book.route");
 
-app.use(express.json());
 app.use("/api/user", resumeUserRoute);
 app.use("/api/portfolio", portfolioRoute);
 app.use("/newsletter", newsletterRouter);
