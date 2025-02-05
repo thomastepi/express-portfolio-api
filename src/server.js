@@ -25,10 +25,6 @@ app.use(
   })
 );
 
-const bookUserRoute = require("./routes/bookUser.route");
-const bookRoute = require("./routes/book.route");
-
-const port = process.env.PORT || 5000;
 require("./config/database");
 const resumeUserRoute = require("./routes/resumeUser.route");
 const portfolioRoute = require("./routes/portfolio.route");
@@ -36,6 +32,8 @@ const newsletterRouter = require("./routes/newsletter.route");
 const contactUsRouter = require("./routes/contactUs.route");
 const checkoutRoute = require("./routes/checkout.route");
 const paypalRoutes = require("./routes/paypal.route");
+const bookUserRoute = require("./routes/bookUser.route");
+const bookRoute = require("./routes/book.route");
 
 app.use(express.json());
 app.use("/api/user", resumeUserRoute);
@@ -48,6 +46,4 @@ app.use("/api", paypalRoutes);
 app.use("/api/users", bookUserRoute);
 app.use("/api/books", bookRoute);
 
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
-});
+module.exports = app;
