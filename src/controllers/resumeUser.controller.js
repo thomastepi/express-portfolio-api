@@ -3,11 +3,23 @@ const bcrypt = require("bcrypt");
 const UserModel = require("../models/resumeUser.model");
 const GuestSessionModel = require("../models/resumeGuestUser.model");
 const runCompletion = require("../config/openai");
+const {
+  validateUser,
+  updateUser,
+  sanitizeInput,
+  validatePrompt,
+} = require("../utils/resumeCraft/validation");
 
 const saltRounds = 10;
 
 async function login(req, res) {
-  const { username, password } = req.body;
+  const { error } = validateUser(req.body);
+  if (error) {
+    return res.status(400).json({ error: error.details[0].message });
+  }
+  username = sanitizeInput(req.body.username);
+  password = sanitizeInput(req.body.password);
+
   const user = await UserModel.findOne({ username }).catch((err) => {
     console.error("Error: ", err);
     res.status(500).json({ error: "Internal server error" });
@@ -46,15 +58,23 @@ async function login(req, res) {
 }
 
 async function register(req, res) {
-  const { username, password } = req.body;
-  const user = await UserModel.findOne({ username }).catch((err) => {
+  const { error } = validateUser(req.body);
+  if (error) {
+    return res.status(400).json(error.details.map((err) => err.message));
+  }
+
+  const username = sanitizeInput(req.body.username);
+  const password = sanitizeInput(req.body.password);
+  const existingUser = await UserModel.findOne({ username }).catch((err) => {
     console.error("Error: ", err);
     res.status(500).send("Internal server error");
   });
-  if (user) {
+  if (existingUser) {
     res.status(400).send("User already exists");
   } else {
-    const accessToken = jwt.sign({ username }, process.env.ACCESS_TOKEN);
+    const accessToken = jwt.sign({ username }, process.env.ACCESS_TOKEN, {
+      expiresIn: "1h",
+    });
     const hashedPassword = await bcrypt.hash(password, saltRounds);
     const newUser = new UserModel({ username, password: hashedPassword });
     newUser
@@ -84,10 +104,33 @@ async function register(req, res) {
 }
 
 async function update(req, res) {
-  const newUserData = req.body;
   try {
-    await UserModel.findOneAndUpdate({ username: req.body.username }, req.body);
-    const user = await UserModel.findOne({ username: newUserData.username });
+    const { error, value } = updateUser.validate(req.body, {
+      abortEarly: false,
+    });
+
+    if (error) {
+      return res
+        .status(400)
+        .json({ error: error.details.map((err) => err.message) });
+    }
+
+    Object.keys(value).forEach((key) => {
+      if (typeof value[key] === "string") {
+        value[key] = sanitizeInput(value[key]);
+      }
+    });
+    const user = await UserModel.findOneAndUpdate(
+      { username: value.username },
+      value,
+      {
+        new: true,
+      }
+    );
+
+    if (!user) {
+      return res.status(404).json({ error: ["User not found"] });
+    }
     res.send({
       username: user.username,
       firstName: user.firstName,
@@ -106,14 +149,18 @@ async function update(req, res) {
     });
   } catch (err) {
     console.log(err);
-    res.status(404).json("Update Failed");
+    res.status(404).json({ error: ["Update Failed"] });
   }
 }
 
 async function build(req, res) {
   const { text } = req.body;
+  const sanitizedText = validatePrompt(text);
+  if (sanitizedText.error) {
+    return res.status(400).json(sanitizedText.error);
+  }
   try {
-    const response = await runCompletion(text);
+    const response = await runCompletion(sanitizedText.text);
     res.json({ data: response.choices });
   } catch (error) {
     if (error.status === 429) {
