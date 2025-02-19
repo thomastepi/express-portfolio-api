@@ -19,7 +19,7 @@ const authenticateToken = (req, res, next) => {
         return res
           .status(403)
           .json(
-            `You're currently logged in as a Guest User, which means you can view content but cannot create, edit, or delete it. To access these features, please log in or sign up for an account.`
+            `You're exploring as a Guest! While you can browse freely, creating, editing, and deleting content requires an account. Sign up for free to unlock all features!`
           );
       }
     }
