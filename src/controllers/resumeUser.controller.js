@@ -160,8 +160,14 @@ async function build(req, res) {
     return res.status(400).json(sanitizedText.error);
   }
   try {
-    const response = await runCompletion(sanitizedText.text);
-    res.json({ data: response.choices });
+    res.setHeader("Content-Type", "text/html");
+    res.setHeader("Transfer-Encoding", "chunked");
+
+    const stream = await runCompletion(sanitizedText.text);
+    for await (const chunk of stream) {
+      res.write(chunk.choices[0]?.delta?.content || "");
+    }
+    res.end();
   } catch (error) {
     if (error.status === 429) {
       res

@@ -8,8 +8,8 @@ async function runCompletion(prompt) {
   const chatCompletion = await openai.chat.completions.create({
     messages: [{ role: 'user', content: prompt }],
     model: 'gpt-3.5-turbo',
+    stream: true,
   });
-  //console.log(chatCompletion);
   return chatCompletion;
 }
 
