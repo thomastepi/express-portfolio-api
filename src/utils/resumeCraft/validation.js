@@ -84,7 +84,13 @@ const updateUser = Joi.object({
     })
   ),
   skills: Joi.array().items(
-    Joi.object({ skill: Joi.string().trim().min(2).max(100) })
+    Joi.object({
+      skill: Joi.string()
+        .trim()
+        .min(2)
+        .max(100)
+        .pattern(/^[a-zA-Z0-9\s\-\+\#\.\,\/\(\)\']+$/),
+    })
   ),
   projects: Joi.array().items(
     Joi.object({
