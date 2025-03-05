@@ -3,6 +3,7 @@ import("node-fetch");
 const router = express.Router();
 const authenticateToken = require("../middleware/authenticateToken");
 const userRateLimit = require("../middleware/userRateLimit");
+const reCAPTCHAVerify = require("../middleware/authenticateRecaptcha");
 
 const {
   login,
@@ -12,8 +13,8 @@ const {
   guestSession,
 } = require("../controllers/resumeUser.controller");
 
-router.post("/login", login);
-router.post("/register", register);
+router.post("/login", reCAPTCHAVerify, login);
+router.post("/register", reCAPTCHAVerify, register);
 router.patch("/update", authenticateToken, update);
 router.post("/build", authenticateToken, userRateLimit, build);
 router.post("/guest-log", guestSession);
