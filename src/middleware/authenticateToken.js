@@ -8,7 +8,15 @@ const authenticateToken = (req, res, next) => {
   token = token.replace("Bearer ", "");
   jwt.verify(token, process.env.ACCESS_TOKEN, async (err, decoded) => {
     if (err) {
-      return res.status(401).send("Invalid Token");
+      if (err.name === "TokenExpiredError") {
+        return res.status(401).json({
+          error: "Session Expired",
+          message: "Your session has expired. Please log in again.",
+        });
+      }
+      return res
+        .status(401)
+        .json({ error: "Invalid Token", message: "Invalid token provided." });
     }
     if (
       decoded.role === "guest" &&
