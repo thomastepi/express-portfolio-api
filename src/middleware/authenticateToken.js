@@ -10,20 +10,17 @@ const authenticateToken = (req, res, next) => {
     if (err) {
       return res.status(401).send("Invalid Token");
     }
-    if (decoded.role && decoded.role === "guest") {
-      if (
-        req.method === "POST" ||
-        req.method === "PATCH" ||
-        req.method === "DELETE"
-      ) {
-        return res
-          .status(403)
-          .json(
-            `You're exploring as a Guest! While you can browse freely, creating, editing, and deleting content requires an account. Sign up for free to unlock all features!`
-          );
-      }
+    if (
+      decoded.role === "guest" &&
+      ["POST", "PATCH", "DELETE"].includes(req.method)
+    ) {
+      return res.status(403).json({
+        error: "Unauthorized Access!",
+        message:
+          "You're exploring as a Guest! While you can browse freely, creating, editing, and deleting content requires an account. Sign up for free to unlock all features!",
+      });
     }
-    req.body.user = decoded;
+    req.user = decoded;
     next();
   });
 };

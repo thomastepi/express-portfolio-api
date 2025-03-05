@@ -2,6 +2,7 @@ const express = require("express");
 import("node-fetch");
 const router = express.Router();
 const authenticateToken = require("../middleware/authenticateToken");
+const userRateLimit = require("../middleware/userRateLimit");
 
 const {
   login,
@@ -14,7 +15,7 @@ const {
 router.post("/login", login);
 router.post("/register", register);
 router.patch("/update", authenticateToken, update);
-router.post("/build", authenticateToken, build);
+router.post("/build", authenticateToken, userRateLimit, build);
 router.post("/guest-log", guestSession);
 
 module.exports = router;

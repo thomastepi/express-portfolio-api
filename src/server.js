@@ -28,6 +28,12 @@ app.use(
     },
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     credentials: true,
+    exposedHeaders: [
+      "RateLimit",
+      "Ratelimit",
+      "X-RateLimit-Remaining",
+      "X-RateLimit-Reset",
+    ],
   })
 );
 

@@ -22,19 +22,21 @@ async function login(req, res) {
 
   const user = await UserModel.findOne({ username }).catch((err) => {
     console.error("Error: ", err);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ message: "Internal server error" });
   });
   if (!user) {
-    res.status(404).json({ error: "User not found" });
+    res.status(404).json({ message: "User not found" });
   } else {
     const match = await bcrypt.compare(password, user.password);
     if (match) {
       const role = user.username === "guest" ? "guest" : "user";
       const accessToken = jwt.sign(
-        { username: user.username, role: role },
-        process.env.ACCESS_TOKEN
+        { id: user._id.toString(), username: user.username, role: role },
+        process.env.ACCESS_TOKEN,
+        { expiresIn: "1h" }
       );
       res.status(200).json({
+        id: user._id.toString(),
         username: user.username,
         firstName: user.firstName,
         lastName: user.lastName,
@@ -52,7 +54,7 @@ async function login(req, res) {
         accessToken,
       });
     } else {
-      res.status(401).json({ error: "Invalid password" });
+      res.status(401).json({ message: "Invalid password" });
     }
   }
 }
@@ -60,17 +62,19 @@ async function login(req, res) {
 async function register(req, res) {
   const { error } = validateUser(req.body);
   if (error) {
-    return res.status(400).json(error.details.map((err) => err.message));
+    return res
+      .status(400)
+      .json({ message: error.details.map((err) => err.message) });
   }
 
   const username = sanitizeInput(req.body.username);
   const password = sanitizeInput(req.body.password);
   const existingUser = await UserModel.findOne({ username }).catch((err) => {
     console.error("Error: ", err);
-    res.status(500).send("Internal server error");
+    res.status(500).json({ message: "Internal server error" });
   });
   if (existingUser) {
-    res.status(400).send("User already exists");
+    res.status(400).json({ message: "User already exists" });
   } else {
     const accessToken = jwt.sign({ username }, process.env.ACCESS_TOKEN, {
       expiresIn: "1h",
@@ -80,7 +84,8 @@ async function register(req, res) {
     newUser
       .save()
       .then((user) => {
-        res.status(201).send({
+        res.status(201).json({
+          id: user._id.toString(),
           username: user.username,
           firstName: user.firstName,
           lastName: user.lastName,
@@ -98,7 +103,7 @@ async function register(req, res) {
       })
       .catch((err) => {
         console.error("Error: ", err);
-        res.status(500).send("Internal server error");
+        res.status(500).json({ message: "Internal server error" });
       });
   }
 }
@@ -112,7 +117,7 @@ async function update(req, res) {
     if (error) {
       return res
         .status(400)
-        .json({ error: error.details.map((err) => err.message) });
+        .json({ message: error.details.map((err) => err.message) });
     }
 
     Object.keys(value).forEach((key) => {
@@ -129,7 +134,7 @@ async function update(req, res) {
     );
 
     if (!user) {
-      return res.status(404).json({ error: ["User not found"] });
+      return res.status(404).json({ message: "User not found" });
     }
     res.send({
       username: user.username,
@@ -149,7 +154,10 @@ async function update(req, res) {
     });
   } catch (err) {
     console.log(err);
-    res.status(404).json({ error: ["Update Failed"] });
+    res.status(404).json({
+      error: "Update Failed",
+      message: err.message || "Failed to update user",
+    });
   }
 }
 
@@ -170,14 +178,17 @@ async function build(req, res) {
     res.end();
   } catch (error) {
     if (error.status === 429) {
-      res
-        .status(429)
-        .json(
-          "The AI-powered resume builder is currently unavailable due to quota limitations. We are working on resolving this, and it will be up and running soon. Thank you for your understanding!"
-        );
+      res.status(429).json({
+        error: "AI-powered resume builder is currently unavailable.",
+        message:
+          "The AI-powered resume builder is currently unavailable due to quota limitations. We are working on resolving this, and it will be up and running soon. Thank you for your understanding!",
+      });
     } else {
       console.error(error.message);
-      res.status(500).json("Internal server error");
+      res.status(500).json({
+        error: "Internal Server Error",
+        message: "Something went wrong. Please try again later.",
+      });
     }
   }
 }
