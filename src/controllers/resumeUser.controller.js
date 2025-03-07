@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const { OAuth2Client } = require("google-auth-library");
 const UserModel = require("../models/resumeUser.model");
 const GuestSessionModel = require("../models/resumeGuestUser.model");
 const runCompletion = require("../config/openai");
@@ -57,6 +58,50 @@ async function login(req, res) {
     } else {
       res.status(401).json({ message: "Invalid password" });
     }
+  }
+}
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+async function googleOAuth(req, res) {
+  try {
+    const { token } = req.body;
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const { email, name, picture, sub } = ticket.getPayload();
+
+    let user = await UserModel.findOne({ googleId: sub });
+
+    if (!user) {
+      user = new UserModel({
+        googleId: sub,
+        username: name,
+        email: email,
+        avatar: picture,
+        role: "user",
+      });
+      await user.save();
+    }
+
+    const userObject = user.toObject();
+
+    const accessToken = jwt.sign(
+      {
+        id: userObject._id,
+        username: userObject.username,
+        role: userObject.role,
+      },
+      process.env.ACCESS_TOKEN,
+      { expiresIn: "1h" }
+    );
+
+    res.status(200).json({ ...userObject, accessToken });
+  } catch (error) {
+    console.error("Google OAuth Error:", error);
+    res.status(401).json({ message: "Google authentication failed" });
   }
 }
 
@@ -216,6 +261,7 @@ async function guestSession(req, res) {
 
 module.exports = {
   login,
+  googleOAuth,
   register,
   update,
   build,
