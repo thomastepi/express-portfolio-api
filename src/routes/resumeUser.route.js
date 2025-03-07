@@ -14,7 +14,7 @@ const {
 } = require("../controllers/resumeUser.controller");
 
 router.post("/login", reCAPTCHAVerify, login);
-router.post("/register", reCAPTCHAVerify, register);
+router.post("/register", register);
 router.patch("/update", authenticateToken, update);
 router.post("/build", authenticateToken, userRateLimit, build);
 router.post("/guest-log", guestSession);

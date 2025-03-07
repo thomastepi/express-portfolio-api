@@ -67,7 +67,6 @@ async function register(req, res) {
       .status(400)
       .json({ message: error.details.map((err) => err.message) });
   }
-
   const username = sanitizeInput(req.body.username);
   const password = sanitizeInput(req.body.password);
   const existingUser = await UserModel.findOne({ username }).catch((err) => {
@@ -77,9 +76,13 @@ async function register(req, res) {
   if (existingUser) {
     res.status(400).json({ message: "User already exists" });
   } else {
-    const accessToken = jwt.sign({ username }, process.env.ACCESS_TOKEN, {
-      expiresIn: "1h",
-    });
+    const accessToken = jwt.sign(
+      { username, role: "user" },
+      process.env.ACCESS_TOKEN,
+      {
+        expiresIn: "1h",
+      }
+    );
     const hashedPassword = await bcrypt.hash(password, saltRounds);
     const newUser = new UserModel({ username, password: hashedPassword });
     newUser
