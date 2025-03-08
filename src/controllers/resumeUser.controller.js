@@ -71,14 +71,29 @@ async function googleOAuth(req, res) {
       audience: process.env.GOOGLE_CLIENT_ID,
     });
 
-    const { email, name, picture, sub } = ticket.getPayload();
+    const {
+      email,
+      email_verified,
+      name,
+      picture,
+      sub,
+      given_name,
+      family_name,
+      exp,
+    } = ticket.getPayload();
+
+    if (!email_verified) {
+      return res.status(400).json({ message: "Email not verified by Google." });
+    }
 
     let user = await UserModel.findOne({ googleId: sub });
 
     if (!user) {
       user = new UserModel({
         googleId: sub,
-        username: name,
+        username: given_name || lastName || name,
+        firstName: given_name,
+        lastName: family_name,
         email: email,
         avatar: picture,
         role: "user",
@@ -185,7 +200,7 @@ async function update(req, res) {
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-    res.send({
+    res.json({
       username: user.username,
       firstName: user.firstName,
       lastName: user.lastName,
