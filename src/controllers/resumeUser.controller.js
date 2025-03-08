@@ -74,12 +74,11 @@ async function googleOAuth(req, res) {
     const {
       email,
       email_verified,
-      name,
+      //name,
       picture,
       sub,
       given_name,
       family_name,
-      exp,
     } = ticket.getPayload();
 
     if (!email_verified) {
@@ -91,7 +90,7 @@ async function googleOAuth(req, res) {
     if (!user) {
       user = new UserModel({
         googleId: sub,
-        username: given_name || lastName || name,
+        username: given_name.toLowerCase() || lastName.toLowerCase(),
         firstName: given_name,
         lastName: family_name,
         email: email,
