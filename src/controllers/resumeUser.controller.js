@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const axios = require("axios");
 const { OAuth2Client } = require("google-auth-library");
 const UserModel = require("../models/resumeUser.model");
 const GuestSessionModel = require("../models/resumeGuestUser.model");
@@ -61,15 +62,15 @@ async function login(req, res) {
   }
 }
 
-const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
-
 async function googleOAuth(req, res) {
   try {
     const { token } = req.body;
-    const ticket = await client.verifyIdToken({
-      idToken: token,
-      audience: process.env.GOOGLE_CLIENT_ID,
-    });
+    const googleUser = await axios.get(
+      "https://www.googleapis.com/oauth2/v3/userinfo",
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
 
     const {
       email,
@@ -79,7 +80,7 @@ async function googleOAuth(req, res) {
       sub,
       given_name,
       family_name,
-    } = ticket.getPayload();
+    } = googleUser.data;
 
     if (!email_verified) {
       return res.status(400).json({ message: "Email not verified by Google." });
