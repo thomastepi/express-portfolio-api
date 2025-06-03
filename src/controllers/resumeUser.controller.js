@@ -1,7 +1,6 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const axios = require("axios");
-const { OAuth2Client } = require("google-auth-library");
 const UserModel = require("../models/resumeUser.model");
 const GuestSessionModel = require("../models/resumeGuestUser.model");
 const runCompletion = require("../config/openai");
@@ -39,7 +38,7 @@ async function login(req, res) {
         { expiresIn: "1h" }
       );
       res.status(200).json({
-        id: user._id.toString(),
+        _id: user._id.toString(),
         username: user.username,
         firstName: user.firstName,
         lastName: user.lastName,
@@ -149,7 +148,7 @@ async function register(req, res) {
       .save()
       .then((user) => {
         res.status(201).json({
-          id: user._id.toString(),
+          _id: user._id.toString(),
           username: user.username,
           firstName: user.firstName,
           lastName: user.lastName,
@@ -179,6 +178,7 @@ async function update(req, res) {
     });
 
     if (error) {
+      console.error("Validation Error:", error.details);
       return res
         .status(400)
         .json({ message: error.details.map((err) => err.message) });
@@ -190,7 +190,7 @@ async function update(req, res) {
       }
     });
     const user = await UserModel.findOneAndUpdate(
-      { username: value.username },
+      { _id: value._id, username: value.username },
       value,
       {
         new: true,
@@ -201,6 +201,7 @@ async function update(req, res) {
       return res.status(404).json({ message: "User not found" });
     }
     res.json({
+      _id: user._id.toString(),
       username: user.username,
       firstName: user.firstName,
       lastName: user.lastName,
@@ -267,10 +268,10 @@ async function guestSession(req, res) {
     await newSession.save();
 
     //console.log("Guest session logged:", sessionId);
-    res.status(200).send({ message: "Guest session logged successfully." });
+    res.status(200).json({ message: "Guest session logged successfully." });
   } catch (error) {
     console.error("Error logging guest session:", error);
-    res.status(500).send({ error: "Failed to log guest session." });
+    res.status(500).json({ error: "Failed to log guest session." });
   }
 }
 
