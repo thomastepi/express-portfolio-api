@@ -7,6 +7,7 @@ const allowedOrigins = [
   "https://resume-craft.onrender.com",
   "http://localhost:3000",
   "https://www.thomastepi.com",
+  "https://portfolio-next-app.onrender.com",
   "https://sawyer-camp-farmers.onrender.com",
   "https://bookmart-trw5.onrender.com",
   "https://annette-beauty-spa.onrender.com",
