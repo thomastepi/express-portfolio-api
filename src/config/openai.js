@@ -7,7 +7,7 @@ const openai = new OpenAI({
 async function runCompletion(prompt) {
   const chatCompletion = await openai.chat.completions.create({
     messages: [{ role: "user", content: prompt }],
-    model: "gpt-4-turbo",
+    model: "gpt-5",
     stream: true,
   });
   return chatCompletion;
