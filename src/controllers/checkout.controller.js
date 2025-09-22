@@ -5,11 +5,11 @@ exports.createPaymentIntent = async (req, res) => {
 
   const line_items = items.map((item) => ({
     price_data: {
-      currency: "usd",
+      currency: "xaf",
       product_data: {
         name: `Recipient: ${item.recipientEmail}`,
       },
-      unit_amount: item.price * 100,
+      unit_amount: item.price,
     },
     quantity: item.quantity,
   }));
