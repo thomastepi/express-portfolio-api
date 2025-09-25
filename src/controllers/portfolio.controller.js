@@ -10,8 +10,15 @@ const {
 const transporter = require("../config/nodemailer");
 
 const addMessage = async (req, res) => {
+  const { name, email, type, comment, language } = req.body;
   try {
-    const validationResult = validateMessage(req.body);
+    const validationResult = validateMessage({
+      name,
+      email,
+      type,
+      comment,
+      language,
+    });
 
     if (validationResult.error) {
       return res.status(400).json(validationResult.error);

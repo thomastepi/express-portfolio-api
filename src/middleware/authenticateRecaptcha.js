@@ -4,7 +4,7 @@ const reCAPTCHAVerify = async (req, res, next) => {
   try {
     const { username, captchaToken } = req.body;
 
-    if (username === "guest") {
+    if (username && username === "guest") {
       return next();
     }
 

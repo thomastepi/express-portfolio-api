@@ -12,7 +12,7 @@ const verifyCaptcha = async (captchaToken) => {
         },
       }
     );
-
+    
     return response.data.success;
   } catch (error) {
     console.error("reCAPTCHA verification failed:", error);
