@@ -15,6 +15,7 @@ const {
   guestSession,
   forgetPassword,
   resetPassword,
+  deleteUser,
 } = require("../controllers/resumeUser.controller");
 
 router.post("/login", reCAPTCHAVerify, login);
@@ -24,6 +25,7 @@ router.patch("/update", authenticateToken, update);
 router.patch("/update-email", authenticateToken, updateEmail);
 router.post("/forget-password", reCAPTCHAVerify, forgetPassword);
 router.post("/reset-password", reCAPTCHAVerify, resetPassword);
+router.delete("/delete-user", authenticateToken, deleteUser);
 router.post("/build", authenticateToken, userRateLimit, build);
 router.post("/guest-log", guestSession);
 
