@@ -137,6 +137,10 @@ const updateUser = Joi.object({
   ),
 }).unknown(true);
 
+const updateUserEmail = Joi.object({
+  email: Joi.string().trim().email().required(),
+}).unknown(true);
+
 const sanitizeInput = (input) =>
   sanitizeHtml(input, { allowedTags: [], allowedAttributes: {} });
 
@@ -154,4 +158,10 @@ const validatePrompt = (prompt) => {
   return { text };
 };
 
-module.exports = { validateUser, updateUser, sanitizeInput, validatePrompt };
+module.exports = {
+  validateUser,
+  updateUser,
+  updateUserEmail,
+  sanitizeInput,
+  validatePrompt,
+};

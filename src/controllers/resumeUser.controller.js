@@ -1,15 +1,21 @@
+require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const axios = require("axios");
-const UserModel = require("../models/resumeUser.model");
+const { UserModel, TokenModel } = require("../models/resumeUser.model");
+const { generateToken } = require("../utils/jwt.helper");
+const crypto = require("crypto");
 const GuestSessionModel = require("../models/resumeGuestUser.model");
 const runCompletion = require("../config/openai");
 const {
   validateUser,
   updateUser,
+  updateUserEmail,
   sanitizeInput,
   validatePrompt,
 } = require("../utils/resumeCraft/validation");
+const transporter = require("../config/nodemailer");
+const { getResetpasswordContent } = require("../templates/emailTemplates");
 
 const saltRounds = 10;
 
@@ -226,6 +232,60 @@ async function update(req, res) {
   }
 }
 
+async function updateEmail(req, res) {
+  try {
+    const { error, value } = updateUserEmail.validate(req.body, {
+      abortEarly: false,
+    });
+    if (error) {
+      console.error("Validation Error:", error.details);
+      return res.status(400).json({ message: error.details[0].message });
+    }
+
+    const { email, _id } = value;
+
+    const exists = await UserModel.findOne({ email });
+    if (exists && exists._id.toString() !== _id) {
+      return res.status(400).json({ message: "Email already in use" });
+    }
+
+    const user = await UserModel.findOneAndUpdate(
+      { _id: _id },
+      { email, $currentDate: { lastModified: true } },
+      {
+        new: true,
+      }
+    );
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.json({
+      _id: user._id.toString(),
+      username: user.username,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      mobileNumber: user.mobileNumber,
+      email: user.email,
+      portfolio: user.portfolio,
+      summary: user.summary,
+      address: user.address,
+      education: user.education,
+      skills: user.skills,
+      projects: user.projects,
+      experience: user.experience,
+      certifications: user.certifications,
+      languages: user.languages,
+    });
+  } catch (e) {
+    console.log("Email update failed: ", e);
+    res.status(404).json({
+      error: "Email Update Failed",
+      message: err.message || "Failed to update email",
+    });
+  }
+}
+
 async function build(req, res) {
   const { text } = req.body;
   const sanitizedText = validatePrompt(text);
@@ -258,6 +318,80 @@ async function build(req, res) {
   }
 }
 
+async function forgetPassword(req, res) {
+  try {
+    const { email } = req.body;
+    const user = await UserModel.findOne(email);
+    if (!user) return res.status(400).json({ error: "Email not found" });
+
+    if (user.googleId) {
+      return res.status(400).json({
+        error: "This account uses Google sign-in. Please log in with Google.",
+      });
+    }
+
+    await TokenModel.deleteOne({ userId: user.id, type: "reset" });
+
+    const resetToken = crypto.randomBytes(32).toString("hex");
+    const hash = crypto.createHash("sha256").update(resetToken).digest("hex");
+    const expiresAt = new Date(Date.now() + 3600 * 1000);
+    await new TokenModel({
+      token: hash,
+      userId: user.id,
+      type: "reset",
+      expiresAt,
+    })
+      .save()
+      .then(() => {
+        console.log("Password reset token saved for user:", user.username);
+      })
+      .catch((err) => {
+        console.error("Error saving reset token:", err);
+      });
+    const resetLink = `${process.env.RESUMECRAFT_CLIENT_URL}set-new-password?token=${resetToken}`;
+    const { subject, html } = getResetpasswordContent(
+      user.email,
+      user.firstName.toUpperCase() ||
+        user.lastName.toUpperCase() ||
+        user.username.toUpperCase(),
+      resetLink
+    );
+
+    transporter.sendMail({
+      from: `"ResumeCraft" <${process.env.EMAIL}>`,
+      to: user.email,
+      subject: subject,
+      html: html,
+    });
+    res.status(200).json({ message: "Password reset token sent" });
+  } catch (error) {
+    console.error("Error in forget password:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+}
+
+async function resetPassword(req, res) {
+  try {
+    const { resetToken, newPassword } = req.body;
+    const hash = crypto.createHash("sha256").update(resetToken).digest("hex");
+    const dbToken = await TokenModel.findOne({ token: hash, type: "reset" });
+
+    if (!dbToken || new Date(dbToken.expiresAt) < new Date()) {
+      return res.status(400).json({ error: "Invalid or expired token" });
+    }
+
+    const user = await UserModel.findOne({ _id: dbToken.userId });
+    user.password = await bcrypt.hash(newPassword, 10);
+    await user.save();
+    await TokenModel.deleteOne({ token: hash, type: "reset" });
+
+    res.status(200).json({ message: "Password reset successful" });
+  } catch (error) {
+    console.error("Error resetting password:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+}
+
 async function guestSession(req, res) {
   try {
     const sessionId = `guest-${Date.now()}-${Math.random()
@@ -280,6 +414,9 @@ module.exports = {
   googleOAuth,
   register,
   update,
+  updateEmail,
   build,
   guestSession,
+  forgetPassword,
+  resetPassword,
 };

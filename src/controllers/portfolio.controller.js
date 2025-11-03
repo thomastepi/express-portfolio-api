@@ -6,7 +6,7 @@ const {
 const {
   getUserEmailContent,
   getAdminEmailContent,
-} = require("../templates/portfolio/emailTemplates");
+} = require("../templates/emailTemplates");
 const transporter = require("../config/nodemailer");
 
 const addMessage = async (req, res) => {

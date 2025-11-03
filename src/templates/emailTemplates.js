@@ -15,11 +15,14 @@ const getUserEmailContent = (name, email, comment, language) => {
       language === "fr"
         ? "Merci de m'avoir contacté!"
         : "Thanks for contacting me!",
-    html: loadTemplate(language === "fr" ? "user_fr" : "user_en", {
-      name,
-      email,
-      comment,
-    }),
+    html: loadTemplate(
+      language === "fr" ? "portfolio/user_fr" : "portfolio/user_en",
+      {
+        name,
+        email,
+        comment,
+      }
+    ),
   };
 };
 
@@ -32,4 +35,19 @@ const getAdminEmailContent = (data) => {
   };
 };
 
-module.exports = { getUserEmailContent, getAdminEmailContent };
+const getResetpasswordContent = (email, name, resetLink) => {
+  return {
+    subject: "Reset your password",
+    html: loadTemplate("resumeCraft/resetPassword", {
+      email,
+      name,
+      resetLink,
+    }),
+  };
+};
+
+module.exports = {
+  getUserEmailContent,
+  getAdminEmailContent,
+  getResetpasswordContent,
+};

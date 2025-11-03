@@ -10,14 +10,20 @@ const {
   googleOAuth,
   register,
   update,
+  updateEmail,
   build,
   guestSession,
+  forgetPassword,
+  resetPassword,
 } = require("../controllers/resumeUser.controller");
 
 router.post("/login", reCAPTCHAVerify, login);
 router.post("/google-oauth", googleOAuth);
 router.post("/register", register);
 router.patch("/update", authenticateToken, update);
+router.patch("/update-email", authenticateToken, updateEmail);
+router.post("/forget-password", reCAPTCHAVerify, forgetPassword);
+router.post("/reset-password", reCAPTCHAVerify, resetPassword);
 router.post("/build", authenticateToken, userRateLimit, build);
 router.post("/guest-log", guestSession);
 

@@ -28,4 +28,38 @@ const userSchema = new mongoose.Schema(
 
 const UserModel = mongoose.model("User", userSchema);
 
-module.exports = UserModel;
+const tokenSchema = new mongoose.Schema(
+  {
+    token: {
+      type: String,
+      required: true,
+      index: true,
+      unique: true,
+    },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+      index: true,
+    },
+    type: {
+      type: String,
+      enum: ["reset", "verify", "refresh"],
+      required: true,
+    },
+    expiresAt: {
+      type: Date,
+      required: true,
+      index: true,
+    },
+    usedAt: {
+      type: Date,
+      default: null,
+    },
+  },
+  { collection: "resume-user-tokens", timestamps: true }
+);
+
+const TokenModel = mongoose.model("Token", tokenSchema);
+
+module.exports = { UserModel, TokenModel };
