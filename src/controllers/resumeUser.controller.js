@@ -377,7 +377,13 @@ async function resetPassword(req, res) {
     const dbToken = await TokenModel.findOne({ token: hash, type: "reset" });
 
     if (!dbToken || new Date(dbToken.expiresAt) < new Date()) {
-      return res.status(400).json({ error: "Invalid or expired token" });
+      return res
+        .status(400)
+        .json({
+          error: "Invalid or expired token",
+          message:
+            "The password reset link is invalid or has expired. Please request a new one.",
+        });
     }
 
     const user = await UserModel.findOne({ _id: dbToken.userId });
