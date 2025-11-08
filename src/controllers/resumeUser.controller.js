@@ -16,13 +16,18 @@ const {
 } = require("../utils/resumeCraft/validation");
 const transporter = require("../config/nodemailer");
 const { getResetpasswordContent } = require("../templates/emailTemplates");
+const sendError = require("../lib/resumeCraft/sendError");
 
 const saltRounds = 10;
 
 async function login(req, res) {
   const { error } = validateUser(req.body);
   if (error) {
-    return res.status(400).json({ message: error.details[0].message });
+    return res.status(400).json({
+      code: "VALIDATION_ERROR",
+      error: "Validation error",
+      message: error.details[0].message,
+    });
   }
 
   username = sanitizeInput(req.body.username);
@@ -30,10 +35,10 @@ async function login(req, res) {
 
   const user = await UserModel.findOne({ username }).catch((err) => {
     console.error("Error: ", err);
-    res.status(500).json({ message: "Internal server error" });
+    return sendError(res, "INTERNAL_SERVER_ERROR");
   });
   if (!user) {
-    res.status(404).json({ message: "User not found" });
+    return sendError(res, "USER_NOT_FOUND", { by: "username" });
   } else {
     const match = await bcrypt.compare(password, user.password);
     if (match) {
@@ -62,7 +67,7 @@ async function login(req, res) {
         accessToken,
       });
     } else {
-      res.status(401).json({ message: "Invalid password" });
+      return sendError(res, "INVALID_CREDENTIALS");
     }
   }
 }
@@ -88,7 +93,7 @@ async function googleOAuth(req, res) {
     } = googleUser.data;
 
     if (!email_verified) {
-      return res.status(400).json({ message: "Email not verified by Google." });
+      return sendError(res, "EMAIL_NOT_VERIFIED");
     }
 
     let user = await UserModel.findOne({ googleId: sub });
@@ -121,7 +126,7 @@ async function googleOAuth(req, res) {
     res.status(200).json({ ...userObject, accessToken });
   } catch (error) {
     console.error("Google OAuth Error:", error);
-    res.status(401).json({ message: "Google authentication failed" });
+    return sendError(res, "GOOGLE_OAUTH_FAILED");
   }
 }
 
@@ -136,10 +141,10 @@ async function register(req, res) {
   const password = sanitizeInput(req.body.password);
   const existingUser = await UserModel.findOne({ username }).catch((err) => {
     console.error("Error: ", err);
-    res.status(500).json({ message: "Internal server error" });
+    return sendError(res, "INTERNAL_SERVER_ERROR");
   });
   if (existingUser) {
-    res.status(400).json({ message: "User already exists" });
+    return sendError(res, "USER_ALREADY_EXISTS");
   } else {
     const accessToken = jwt.sign(
       { username, role: "user" },
@@ -172,7 +177,7 @@ async function register(req, res) {
       })
       .catch((err) => {
         console.error("Error: ", err);
-        res.status(500).json({ message: "Internal server error" });
+        return sendError(res, "INTERNAL_SERVER_ERROR");
       });
   }
 }
@@ -204,7 +209,7 @@ async function update(req, res) {
     );
 
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return sendError(res, "USER_NOT_FOUND", { by: "username" });
     }
     res.json({
       _id: user._id.toString(),
@@ -225,10 +230,7 @@ async function update(req, res) {
     });
   } catch (err) {
     console.log(err);
-    res.status(404).json({
-      error: "Update Failed",
-      message: err.message || "Failed to update user",
-    });
+    return sendError(res, "UPDATE_FAILED");
   }
 }
 
@@ -246,7 +248,7 @@ async function updateEmail(req, res) {
 
     const exists = await UserModel.findOne({ email });
     if (exists && exists._id.toString() !== _id) {
-      return res.status(400).json({ message: "Email already in use" });
+      return sendError(res, "EMAIL_IN_USE");
     }
 
     const user = await UserModel.findOneAndUpdate(
@@ -258,7 +260,7 @@ async function updateEmail(req, res) {
     );
 
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return sendError(res, "USER_NOT_FOUND", { by: "email" });
     }
     res.json({
       _id: user._id.toString(),
@@ -279,10 +281,7 @@ async function updateEmail(req, res) {
     });
   } catch (e) {
     console.log("Email update failed: ", e);
-    res.status(404).json({
-      error: "Email Update Failed",
-      message: err.message || "Failed to update email",
-    });
+    return sendError(res, "EMAIL_UPDATE_FAILED");
   }
 }
 
@@ -303,17 +302,10 @@ async function build(req, res) {
     res.end();
   } catch (error) {
     if (error.status === 429) {
-      res.status(429).json({
-        error: "AI-powered resume builder is currently unavailable.",
-        message:
-          "The AI-powered resume builder is currently unavailable due to quota limitations. We are working on resolving this, and it will be up and running soon. Thank you for your understanding!",
-      });
+      return sendError(res, "RATE_LIMITED");
     } else {
       console.error(error.message);
-      res.status(500).json({
-        error: "Internal Server Error",
-        message: "Something went wrong. Please try again later.",
-      });
+      return sendError(res, "INTERNAL_SERVER_ERROR");
     }
   }
 }
@@ -322,12 +314,12 @@ async function forgetPassword(req, res) {
   try {
     const { email } = req.body;
     const user = await UserModel.findOne(email);
-    if (!user) return res.status(400).json({ error: "Email not found" });
+    if (!user) {
+      return sendError(res, "USER_NOT_FOUND", { by: "email" });
+    }
 
     if (user.googleId) {
-      return res.status(400).json({
-        error: "This account uses Google sign-in. Please log in with Google.",
-      });
+      return sendError(res, "GOOGLE_SIGN_IN");
     }
 
     await TokenModel.deleteOne({ userId: user.id, type: "reset" });
@@ -377,13 +369,7 @@ async function resetPassword(req, res) {
     const dbToken = await TokenModel.findOne({ token: hash, type: "reset" });
 
     if (!dbToken || new Date(dbToken.expiresAt) < new Date()) {
-      return res
-        .status(400)
-        .json({
-          error: "Invalid or expired token",
-          message:
-            "The password reset link is invalid or has expired. Please request a new one.",
-        });
+      return sendError(res, "INVALID_OR_EXPIRED_TOKEN");
     }
 
     const user = await UserModel.findOne({ _id: dbToken.userId });
@@ -394,7 +380,7 @@ async function resetPassword(req, res) {
     res.status(200).json({ message: "Password reset successful" });
   } catch (error) {
     console.error("Error resetting password:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    return sendError(res, "INTERNAL_SERVER_ERROR");
   }
 }
 
@@ -421,14 +407,14 @@ async function deleteUser(req, res) {
     const result = await UserModel.deleteOne({ _id: userId });
     if (result.deletedCount === 0) {
       console.log(`No user found with ID: ${userId}`);
-      res.status(404).json({ error: "User not found" });
+      return sendError(res, "USER_NOT_FOUND");
     } else {
       await TokenModel.deleteMany({ userId: userId });
       res.status(200).json({ message: "User deleted successfully" });
     }
   } catch (error) {
     console.error("Error deleting user:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    return sendError(res, "INTERNAL_SERVER_ERROR");
   }
 }
 

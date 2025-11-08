@@ -1,4 +1,4 @@
-const verifyCaptcha = require("../utils/resumeCraft/verifyCaptcha");
+const verifyCaptcha = require("../lib/resumeCraft/verifyCaptcha");
 
 const reCAPTCHAVerify = async (req, res, next) => {
   try {
