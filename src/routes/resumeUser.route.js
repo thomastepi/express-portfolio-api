@@ -2,7 +2,7 @@ const express = require("express");
 import("node-fetch");
 const router = express.Router();
 const authenticateToken = require("../middleware/authenticateToken");
-const userRateLimit = require("../middleware/userRateLimit");
+const pickLimiter = require("../middleware/userRateLimit");
 const reCAPTCHAVerify = require("../middleware/authenticateRecaptcha");
 
 const {
@@ -26,7 +26,7 @@ router.patch("/update-email", authenticateToken, updateEmail);
 router.post("/forget-password", reCAPTCHAVerify, forgetPassword);
 router.post("/reset-password", reCAPTCHAVerify, resetPassword);
 router.delete("/delete-user", authenticateToken, deleteUser);
-router.post("/build", authenticateToken, userRateLimit, build);
+router.post("/build", authenticateToken, pickLimiter, build);
 router.post("/guest-log", guestSession);
 
 module.exports = router;

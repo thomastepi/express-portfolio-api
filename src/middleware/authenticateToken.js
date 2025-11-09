@@ -18,10 +18,7 @@ const authenticateToken = (req, res, next) => {
         .status(401)
         .json({ error: "Invalid Token", message: "Invalid token provided." });
     }
-    if (
-      decoded.role === "guest" &&
-      ["POST", "PATCH", "DELETE"].includes(req.method)
-    ) {
+    if (decoded.role === "guest" && ["DELETE"].includes(req.method)) {
       return res.status(403).json({
         error: "Unauthorized Access!",
         message:
