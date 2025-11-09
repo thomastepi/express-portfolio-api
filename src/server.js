@@ -18,6 +18,8 @@ const allowedOrigins = [
   "https://annette.thomastepi.com",
 ];
 
+app.set("trust proxy", 1);
+
 app.use(
   cors({
     origin: (origin, callback) => {
