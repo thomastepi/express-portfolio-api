@@ -6,7 +6,11 @@ const tooMany = (by = "user") => {
     error: "Too many resume generations.",
     message: `You've reached the limit of ${
       by === "user" ? "5" : "2"
-    } resume generations per hour. Please wait until the limit resets before trying again.`,
+    } resume generations per hour. Please wait until the limit resets before trying again. ${
+      by === "guest"
+        ? "Consider creating a free account for more generations."
+        : ""
+    }`,
     retryAfter: "1 hour",
     suggestion:
       "Consider refining your resume before regenerating to make the most of your limit.",
@@ -14,11 +18,11 @@ const tooMany = (by = "user") => {
   };
 };
 
-// Guests: 2/hour, keyed by IP
+// Guests: 2/hour, keyed by guestID (fallback to IP)
 const guestLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
   limit: 2,
-  keyGenerator: (req) => req.ip,
+  keyGenerator: (req) => req.guestId || req.ip,
   message: tooMany("guest"),
   standardHeaders: "draft-8",
   legacyHeaders: false,
