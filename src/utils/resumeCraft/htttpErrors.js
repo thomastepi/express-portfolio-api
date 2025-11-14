@@ -75,8 +75,9 @@ const HTTP_ERRORS = {
   },
   RATE_LIMITED: {
     status: 429,
-    error: "Too many requests",
-    message: () => "Please wait a moment before trying again.",
+    error: "AI Not Available",
+    message: () =>
+      "Our AI generation system is currently out of credits. The admin is refreshing our quota. Please try again later.",
   },
 };
 

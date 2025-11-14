@@ -18,11 +18,11 @@ const tooMany = (by = "user") => {
   };
 };
 
-// Guests: 2/hour, keyed by guestID (fallback to IP)
+// Guests: 2/hour, keyed by IP (fallback to guestID)
 const guestLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
   limit: 2,
-  keyGenerator: (req) => req.guestId || req.ip,
+  keyGenerator: (req) => req.ip || req.guestId,
   message: tooMany("guest"),
   standardHeaders: "draft-8",
   legacyHeaders: false,
