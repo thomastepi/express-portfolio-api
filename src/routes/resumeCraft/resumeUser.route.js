@@ -1,10 +1,9 @@
 const express = require("express");
 import("node-fetch");
 const router = express.Router();
-const authenticateToken = require("../middleware/authenticateToken");
-const pickLimiter = require("../middleware/userRateLimit");
-const reCAPTCHAVerify = require("../middleware/authenticateRecaptcha");
-
+const authenticateToken = require("../../middleware/authenticateToken");
+const pickLimiter = require("../../middleware/userRateLimit");
+const reCAPTCHAVerify = require("../../middleware/authenticateRecaptcha");
 const {
   login,
   googleOAuth,
@@ -16,8 +15,8 @@ const {
   forgetPassword,
   resetPassword,
   deleteUser,
-} = require("../controllers/resumeUser.controller");
-const ensureGuestId = require("../middleware/ensureGuestId");
+} = require("../../controllers/resumeCraft/resumeUser.controller");
+const ensureGuestId = require("../../middleware/ensureGuestId");
 
 router.post("/login", reCAPTCHAVerify, login);
 router.post("/google-oauth", googleOAuth);

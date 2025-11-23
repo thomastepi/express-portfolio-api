@@ -1,13 +1,13 @@
-const PortfolioModel = require("../models/portfolio.model");
+const PortfolioModel = require("../../models/portfolio.model");
 const {
   validateMessage,
   sanitizeInput,
-} = require("../utils/portfolio/validation");
+} = require("../../utils/portfolio/validation");
 const {
   getUserEmailContent,
   getAdminEmailContent,
-} = require("../templates/emailTemplates");
-const transporter = require("../config/nodemailer");
+} = require("../../templates/emailTemplates");
+const transporter = require("../../config/nodemailer");
 
 const addMessage = async (req, res) => {
   const { name, email, type, comment, language } = req.body;

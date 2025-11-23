@@ -2,21 +2,21 @@ require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const axios = require("axios");
-const { UserModel, TokenModel } = require("../models/resumeUser.model");
-const { generateToken } = require("../utils/jwt.helper");
+const { UserModel, TokenModel } = require("../../models/resumeUser.model");
+const { generateToken } = require("../../utils/jwt.helper");
 const crypto = require("crypto");
-const GuestSessionModel = require("../models/resumeGuestUser.model");
-const runCompletion = require("../config/openai");
+const GuestSessionModel = require("../../models/resumeGuestUser.model");
+const runCompletion = require("../../lib/resumeCraft/runCompletions");
 const {
   validateUser,
   updateUser,
   updateUserEmail,
   sanitizeInput,
   validatePrompt,
-} = require("../utils/resumeCraft/validation");
-const transporter = require("../config/nodemailer");
-const { getResetpasswordContent } = require("../templates/emailTemplates");
-const sendError = require("../lib/resumeCraft/sendError");
+} = require("../../utils/resumeCraft/validation");
+const transporter = require("../../config/nodemailer");
+const { getResetpasswordContent } = require("../../templates/emailTemplates");
+const sendError = require("../../lib/resumeCraft/sendError");
 
 const saltRounds = 10;
 

@@ -2,7 +2,7 @@ const express = require("express");
 const {
   createOrder,
   captureOrder,
-} = require("../controllers/paypal.controller");
+} = require("../../controllers/sawyerCamp/paypal.controller");
 
 const router = express.Router();
 

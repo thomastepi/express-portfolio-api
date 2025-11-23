@@ -6,8 +6,8 @@ const {
   getBooks,
   deleteBook,
   updateBook,
-} = require("../controllers/book.controller");
-const authenticateToken = require('../middleware/authenticateToken');
+} = require("../../controllers/bookmart/book.controller");
+const authenticateToken = require('../../middleware/authenticateToken');
 
 
 router.post("/create", authenticateToken, createBook);

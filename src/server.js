@@ -48,19 +48,29 @@ app.options("*", cors());
 app.use(express.json());
 
 require("./config/database");
-const resumeUserRoute = require("./routes/resumeUser.route");
-const portfolioRoute = require("./routes/portfolio.route");
-const newsletterRouter = require("./routes/newsletter.route");
-const contactUsRouter = require("./routes/contactUs.route");
-const checkoutRoute = require("./routes/checkout.route");
-const paypalRoutes = require("./routes/paypal.route");
-const bookUserRoute = require("./routes/bookUser.route");
-const bookRoute = require("./routes/book.route");
+
+// Importing Routes
+const resumeUserRoute = require("./routes/resumeCraft/resumeUser.route");
+const portfolioRoute = require("./routes/portfolio/portfolio.route");
+
+// sawyerCamp routes
+const newsletterRouter = require("./routes/sawyerCamp/newsletter.route");
+const contactUsRouter = require("./routes/sawyerCamp/contactUs.route");
+const paypalRoutes = require("./routes/sawyerCamp/paypal.route");
+const analyzeImageRouter = require("./routes/sawyerCamp/aiLab");
+
+// annette beauty spa routes
+const checkoutRoute = require("./routes/annetteBeautySpa/checkout.route");
+
+// bookmart routes
+const bookUserRoute = require("./routes/bookmart/bookUser.route");
+const bookRoute = require("./routes/bookmart/book.route");
 
 app.use("/api/user", resumeUserRoute);
 app.use("/api/portfolio", portfolioRoute);
 app.use("/newsletter", newsletterRouter);
 app.use("/contact-us", contactUsRouter);
+app.use("/api/sawyer-camp", analyzeImageRouter);
 app.use("/api", checkoutRoute);
 app.use("/api", paypalRoutes);
 

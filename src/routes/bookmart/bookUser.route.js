@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const { login, register, updateUser } = require("../controllers/bookUser.controller");
-const authenticateToken = require('../middleware/authenticateToken');
+const { login, register, updateUser } = require("../../controllers/bookmart/bookUser.controller");
+const authenticateToken = require('../../middleware/authenticateToken');
 
 
 router.post("/register", register);

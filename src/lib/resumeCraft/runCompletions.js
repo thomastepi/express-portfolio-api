@@ -1,8 +1,4 @@
-const  { OpenAI } = require('openai');
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+const openai = require("../../config/openaiClient");
 
 async function runCompletion(prompt) {
   const chatCompletion = await openai.chat.completions.create({
