@@ -2,10 +2,10 @@ require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const axios = require("axios");
-const { UserModel, TokenModel } = require("../../models/resumeUser.model");
+const { UserModel, TokenModel } = require("../../models/resumeCraft/resumeUser.model");
 const { generateToken } = require("../../utils/jwt.helper");
 const crypto = require("crypto");
-const GuestSessionModel = require("../../models/resumeGuestUser.model");
+const GuestSessionModel = require("../../models/resumeCraft/resumeGuestUser.model");
 const runCompletion = require("../../lib/resumeCraft/runCompletions");
 const {
   validateUser,

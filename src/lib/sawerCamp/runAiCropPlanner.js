@@ -5,11 +5,11 @@ async function runAiCropPlanner(prompt) {
     model: "gpt-5",
     reasoning: { effort: "low" },
     input: prompt,
-    // tools: [
-    //   {
-    //     type: "web_search",
-    //   },
-    // ],
+    tools: [
+      {
+        type: "web_search",
+      },
+    ],
   });
   return response.output_text;
 }

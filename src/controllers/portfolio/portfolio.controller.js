@@ -1,4 +1,4 @@
-const PortfolioModel = require("../../models/portfolio.model");
+const PortfolioModel = require("../../models/portfolio/portfolio.model");
 const {
   validateMessage,
   sanitizeInput,

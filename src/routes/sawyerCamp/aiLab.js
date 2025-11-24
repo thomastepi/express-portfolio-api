@@ -4,6 +4,8 @@ const multer = require("multer");
 const {
   analyzeImage,
   aiCropPlanner,
+  startCropPlannerJob,
+  getJobStatus,
 } = require("../../controllers/sawyerCamp/aiLab");
 
 const upload = multer({
@@ -14,6 +16,7 @@ const upload = multer({
 });
 
 router.post("/analyze-image", upload.single("image"), analyzeImage);
-router.post("/ai-crop-planner", aiCropPlanner);
+router.post("/ai-crop-planner", startCropPlannerJob);
+router.get("/ai-crop-planner/status/:jobId", getJobStatus);
 
 module.exports = router;
