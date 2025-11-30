@@ -48,7 +48,7 @@ async function aiCropPlanner(req, res) {
     const cropPlan = await runAiCropPlanner(prompt);
     res.status(200).json(cropPlan);
   } catch (error) {
-    console.error("Error during AI crop planning:", error);
+    console.log("Error during AI crop planning:", error);
     res.status(500).json({ error: error.message });
   }
 }

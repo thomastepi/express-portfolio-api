@@ -51,6 +51,7 @@ require("./config/database");
 
 // Importing Routes
 const resumeUserRoute = require("./routes/resumeCraft/resumeUser.route");
+const userResumeTemplateRoute = require("./routes/resumeCraft/userResumeTemplate.route");
 const portfolioRoute = require("./routes/portfolio/portfolio.route");
 
 // sawyerCamp routes
@@ -67,6 +68,7 @@ const bookUserRoute = require("./routes/bookmart/bookUser.route");
 const bookRoute = require("./routes/bookmart/book.route");
 
 app.use("/api/user", resumeUserRoute);
+app.use("/api/templates", userResumeTemplateRoute);
 app.use("/api/portfolio", portfolioRoute);
 app.use("/newsletter", newsletterRouter);
 app.use("/contact-us", contactUsRouter);
