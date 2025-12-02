@@ -50,9 +50,12 @@ app.use(express.json());
 require("./config/database");
 
 // Importing Routes
+const portfolioRoute = require("./routes/portfolio/portfolio.route");
+
+// resumeCraft routes
 const resumeUserRoute = require("./routes/resumeCraft/resumeUser.route");
 const userResumeTemplateRoute = require("./routes/resumeCraft/userResumeTemplate.route");
-const portfolioRoute = require("./routes/portfolio/portfolio.route");
+const resumeAnalyzerRoute = require("./routes/resumeCraft/resumeAnalyzer.route");
 
 // sawyerCamp routes
 const newsletterRouter = require("./routes/sawyerCamp/newsletter.route");
@@ -69,6 +72,7 @@ const bookRoute = require("./routes/bookmart/book.route");
 
 app.use("/api/user", resumeUserRoute);
 app.use("/api/templates", userResumeTemplateRoute);
+app.use("/api/resume", resumeAnalyzerRoute);
 app.use("/api/portfolio", portfolioRoute);
 app.use("/newsletter", newsletterRouter);
 app.use("/contact-us", contactUsRouter);
